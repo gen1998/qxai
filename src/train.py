@@ -121,7 +121,7 @@ def run_fold(Config, device):
             if epoch == er.val_epoch:
                 torch.save(
                     model.state_dict(),
-                    f"./save/{Config.folder_name}_{fold + 1}_{epoch}",
+                    f"./save/{Config.project_name}_{fold + 1}_{epoch}",
                 )
 
         del model, optimizer, train_loader, val_loader, scheduler
@@ -153,7 +153,7 @@ def run_fold(Config, device):
             pretrained=Config.pretrained,
         ).to(device)
         model.load_state_dict(
-            torch.load(f"./save/{Config.folder_name}_{fold + 1}_{er.val_epoch}")
+            torch.load(f"./save/{Config.project_name}_{fold + 1}_{er.val_epoch}")
         )
 
         tst_preds = []
@@ -183,7 +183,7 @@ def run_fold(Config, device):
         result = pd.concat([result, val_df])
 
     # 予測結果を保存
-    folder_name = Config.folder_name
+    folder_name = Config.project_name
     folder_path = "./result/predictions/"
 
     result.to_csv(f"{folder_path}/{folder_name}_preds.csv", index=False)
@@ -281,7 +281,7 @@ def run_split(Config, device):
         if epoch == er.val_epoch:
             torch.save(
                 model.state_dict(),
-                f"./save/{Config.folder_name}_{epoch}",
+                f"./save/{Config.project_name}_{epoch}",
             )
 
     del model, optimizer, train_loader, val_loader, scheduler
@@ -310,7 +310,7 @@ def run_split(Config, device):
         model_arch=Config.model_arch,
         pretrained=Config.pretrained,
     ).to(device)
-    model.load_state_dict(torch.load(f"./save/{Config.folder_name}_{er.val_epoch}"))
+    model.load_state_dict(torch.load(f"./save/{Config.project_name}_{er.val_epoch}"))
 
     tst_preds = []
     val_preds = []
@@ -337,7 +337,7 @@ def run_split(Config, device):
     result.reset_index(drop=True)
 
     # 予測結果を保存
-    folder_name = Config.folder_name
+    folder_name = Config.project_name
     folder_path = "./result/predictions"
 
     result.to_csv(f"{folder_path}/{folder_name}_preds.csv", index=False)

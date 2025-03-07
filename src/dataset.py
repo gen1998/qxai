@@ -134,7 +134,7 @@ def set_kmeans_dataloader(
     df: pd.DataFrame,
     input_shape: int,
     valid_bs: int,
-    num_workers: int,
+    num_workers: int = 4,
     split: bool = True,
     tst_idx: int = 0,
     val_idx: int = 0,

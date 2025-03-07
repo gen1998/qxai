@@ -232,60 +232,13 @@ def inference_embeddings(model, data_loader, device):
     return image_preds_all
 
 
-def get_image_predictions_kmeans(
-    df_tst, df_val, test_embeddings, val_embeddings, n_clusters, index
-):
-    """train and predict cluster
-    val : train
-    test : predict
-    """
-    if index == 0:
-        model = KMeans(n_clusters=n_clusters, max_iter=300, init="scalable-k-means++")
-        model.fit(val_embeddings)
-        df_val[f"labels_{index}"] = model.labels_
-        df_tst[f"labels_{index}"] = model.predict(test_embeddings)
-    else:
-        df_val[f"labels_{index}"] = -100
-        df_tst[f"labels_{index}"] = -100
-        indexes = df_val[f"labels_{index - 1}"].unique()
-        for i in indexes:
-            buff = df_val[df_val[f"labels_{index - 1}"] == i]
-            if len(buff) < 10 or i == -100:
-                continue
-            p = len(buff[buff["label"] == 0]) / len(buff)
-            if p > 0.95 or p < 0.05:
-                continue
-            attention_index_val = np.where(df_val[f"labels_{index - 1}"] == i)
-            attention_index_tst = np.where(df_tst[f"labels_{index - 1}"] == i)
-            embeddings_val = val_embeddings[attention_index_val]
-            embeddings_tst = test_embeddings[attention_index_tst]
-            if len(embeddings_val) < 1:
-                continue
-            model = KMeans(
-                n_clusters=n_clusters, max_iter=300, init="scalable-k-means++"
-            )
-            model.fit(embeddings_val)
-            df_val.loc[attention_index_val[0], f"labels_{index}"] = (
-                model.labels_ + 2 * i
-            )
-            if len(embeddings_tst) < 1:
-                continue
-            df_tst.loc[attention_index_tst[0], f"labels_{index}"] = (
-                model.predict(embeddings_tst) + 2 * i
-            )
-
-    return df_val, df_tst
-
-
-def step_one_clustering(
-    df_tst, df_val, val_embeddings, test_embeddings, index, hie, n_clusters=2
-):
+def step_one_clustering(df_tst, df_val, val_embeddings, test_embeddings, index, hie):
     attention_index_val = np.where(df_val[f"labels_{index - 1}"] == hie)
     attention_index_tst = np.where(df_tst[f"labels_{index - 1}"] == hie)
     embeddings_val = val_embeddings[attention_index_val]
     embeddings_tst = test_embeddings[attention_index_tst]
 
-    model = KMeans(n_clusters=n_clusters, max_iter=300, init="scalable-k-means++")
+    model = KMeans(n_clusters=2, max_iter=300, init="scalable-k-means++")
     model.fit(embeddings_val)
     df_val.loc[attention_index_val[0], f"labels_{index}"] = model.labels_ + 2 * hie
 
@@ -332,10 +285,10 @@ def check_divided_lightgbm(buff, features):
 
 
 def hierarchyclustering_train_infer(
-    df_tst, df_val, features, test_embeddings, val_embeddings, n_clusters, index
+    df_tst, df_val, features, test_embeddings, val_embeddings, index
 ):
     if index == 0:
-        model = KMeans(n_clusters=n_clusters, max_iter=300, init="scalable-k-means++")
+        model = KMeans(n_clusters=2, max_iter=300, init="scalable-k-means++")
         model.fit(val_embeddings)
         df_val[f"labels_{index}"] = model.labels_
         df_tst[f"labels_{index}"] = model.predict(test_embeddings)
@@ -344,27 +297,26 @@ def hierarchyclustering_train_infer(
         df_tst[f"labels_{index}"] = -100
         hierarchy = df_val[f"labels_{index - 1}"].unique()
         for hie in hierarchy:
-            # 前の分離で分けられていないクラスタはスキップ
+            # finish end cluster
             if hie == -100:
                 continue
 
             buff = df_val[df_val[f"labels_{index - 1}"] == hie]
-            # 所属する枚数が10枚以下のクラスタはスキップ
+            # finish less than 10 images
             if len(buff) < 10:
                 continue
 
             p = len(buff[buff["label"] == 0]) / len(buff)
-            # どちらかに偏っている場合はスキップ
+            # finish biased clsuter
             if p > 0.95 or p < 0.05:
-                # 150枚以下は問答無用にスキップ
+                # finish less than 150 images
                 if len(buff) < 150:
                     continue
                 check_lgb = check_divided_lightgbm(buff, features)
-                # 分けられるクラスタはスキップ
+                # finish classified by using lightgbm
                 if check_lgb == 1:
                     continue
 
-            # 二つに分けるクラスタリングをするだけ
             df_tst, df_val = step_one_clustering(
                 df_tst, df_val, val_embeddings, test_embeddings, index, hie
             )
