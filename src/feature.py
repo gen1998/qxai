@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from . import BASE_ROI_IMAGE_PATH
+from . import BASE_HOVERNET_JSON_PATH, BASE_ROI_IMAGE_PATH
 
 
 class NpEncoder(json.JSONEncoder):
@@ -71,7 +71,7 @@ def create_nuclear_features():
 
     for img_name in tqdm(name_list):
         img_name = img_name[:-4]
-        with open(f"./dataset/hovernet/{img_name}.json", "r") as f:
+        with open(os.path.join(BASE_HOVERNET_JSON_PATH, f"{img_name}.json"), "r") as f:
             json_data = json.load(f)
 
         category = "s"
@@ -179,12 +179,15 @@ def create_percentile_features(area_th: int = 200, chr_th: int = 65):
 def create_features(Config):
     if Config.log:
         logging.basicConfig(
-            filename=f"./logs/log_{Config.project_name}.log",
+            filename=f"./log/{Config.project_name}.log",
             level=logging.DEBUG,
             filemode="a",
             format="%(asctime)s - %(levelname)s - %(message)s",
         )
-        logging.debug("Create features phase")
+        logging.debug("feature generation phase")
 
     create_nuclear_features()
     create_percentile_features()
+
+    if Config.log:
+        logging.debug("finish feature generation")

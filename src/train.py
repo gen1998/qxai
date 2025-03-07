@@ -295,7 +295,7 @@ def run_split(Config, device):
     test_df = data_load(
         ver="split",
         bio_rate=Config.bio_rate,
-        sur_rate=Config.sur_rat,
+        sur_rate=Config.sur_rate,
     )
 
     tst_loader, tst_df, val_loader, val_df = set_infer_dataloader(
