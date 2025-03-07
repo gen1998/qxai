@@ -20,13 +20,14 @@ from src.utils import data_load
 def run_fold(Config, device):
     # training section
     ## data load
+    print("Load dataset")
     train_df = data_load(
         ver="fold",
         bio_rate=Config.bio_rate,
         sur_rate=Config.sur_rate,
     )
-    print(f"surgery : {len(train_df[train_df.surgery == 1])}")
-    print(f"biopsy : {len(train_df[train_df.surgery == 0])}")
+    print(f"surgery : {len(train_df[train_df.category == 'surgery'])}")
+    print(f"biopsy : {len(train_df[train_df.category == 'biopsy'])}")
     print()
 
     ## logging
@@ -43,8 +44,8 @@ def run_fold(Config, device):
         logging.debug(f"Rate of using surgery : {Config.sur_rate}")
         logging.debug(f"Rate of using biopsy : {Config.bio_rate}")
 
-        logging.debug(f"surgery : {len(train_df[train_df.surgery == 1])}")
-        logging.debug(f"biopsy : {len(train_df[train_df.surgery == 0])}")
+        logging.debug(f"surgery : {len(train_df[train_df.category == 'surgery'])}")
+        logging.debug(f"biopsy : {len(train_df[train_df.category == 'biopsy'])}")
 
     result = pd.DataFrame()
 
@@ -194,13 +195,14 @@ def run_fold(Config, device):
 def run_split(Config, device):
     # train section
     ## train dataset
+    print("Load dataset")
     train_df = data_load(
         ver="split",
         bio_rate=Config.bio_rate,
         sur_rate=Config.sur_rate,
     )
-    print(f"surgery : {len(train_df[train_df.surgery == 1])}")
-    print(f"biopsy : {len(train_df[train_df.surgery == 0])}")
+    print(f"surgery : {len(train_df[train_df.category == 'surgery'])}")
+    print(f"biopsy : {len(train_df[train_df.category == 'biopsy'])}")
     print()
 
     # logging
@@ -217,8 +219,8 @@ def run_split(Config, device):
         logging.debug(f"Rate of using surgery : {Config.sur_rate}")
         logging.debug(f"Rate of using biopsy : {Config.bio_rate}")
 
-        logging.debug(f"surgery : {len(train_df[train_df.surgery == 1])}")
-        logging.debug(f"biopsy : {len(train_df[train_df.surgery == 0])}")
+        logging.debug(f"surgery : {len(train_df[train_df.category == 'surgery'])}")
+        logging.debug(f"biopsy : {len(train_df[train_df.category == 'biopsy'])}")
 
     result = pd.DataFrame()
 

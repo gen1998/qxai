@@ -14,10 +14,8 @@ def data_load(
 ) -> pd.DataFrame:
     df_input = pd.read_csv("./dataset/csv/input.csv")
 
-    df_surgery = df_input[df_input.surgery == 1]
-    df_surgery.loc[:, "category"] = "surgery"
-    df_biopsy = df_input[df_input.surgery == 0]
-    df_surgery.loc[:, "category"] = "biopsy"
+    df_surgery = df_input[df_input.category == "surgery"]
+    df_biopsy = df_input[df_input.category == "biopsy"]
     num_surgery = int(len(df_surgery) * sur_rate)
     num_biopsy = int(len(df_biopsy) * bio_rate)
     df_surgery = df_surgery.sample(num_surgery).reset_index(drop=True)

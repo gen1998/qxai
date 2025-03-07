@@ -186,6 +186,9 @@ def create_features(Config):
         )
         logging.debug("feature generation phase")
 
+    print("feature generation phase")
+    print()
+
     create_nuclear_features()
     create_percentile_features()
 

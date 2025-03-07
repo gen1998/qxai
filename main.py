@@ -2,6 +2,8 @@ import argparse
 
 import torch
 
+from src.clustering import kmeans_split, select_cluster_split
+from src.evaluate import evaluate_split, infer_grade
 from src.feature import create_features
 from src.train import run_fold, run_split
 from src.utils import seed_everything
@@ -16,6 +18,8 @@ def parse_arguments():
     # action setting
     parser.add_argument("--create_feature", action="store_true")
     parser.add_argument("--train", action="store_true")
+    parser.add_argument("--kmeans", action="store_true")
+    parser.add_argument("--evaluate", action="store_true")
 
     # data setting
     parser.add_argument("--project_name", default="qxai_split", type=str)
@@ -45,6 +49,7 @@ def main():
     # config, global value setting
     Config = parse_arguments()
     print(Config)
+
     seed_everything(Config.seed)
     device = torch.device("cuda:0")
 
@@ -56,6 +61,20 @@ def main():
             run_fold(Config=Config, device=device)
         elif Config.project_type == "split":
             run_split(Config=Config, device=device)
+
+    if Config.kmeans:
+        if Config.project_type == "fold":
+            run_fold(Config=Config, device=device)
+        elif Config.project_type == "split":
+            kmeans_split(Config=Config, device=device)
+            select_cluster_split(Config=Config)
+
+    if Config.evaluate:
+        if Config.project_type == "fold":
+            run_fold(Config=Config, device=device)
+        elif Config.project_type == "split":
+            infer_grade(Config=Config)
+            evaluate_split(Config=Config)
 
 
 if __name__ == "__main__":
