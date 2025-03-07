@@ -39,9 +39,9 @@ def run_fold(Config, device):
         )
         logging.debug("Training Phase")
         logging.debug("practice_type : fold")
-        logging.debug(f"model : {Config['model_arch']}")
-        logging.debug(f"Rate of using surgery : {Config['sur_rate']}")
-        logging.debug(f"Rate of using biopsy : {Config['bio_rate']}")
+        logging.debug(f"model : {Config.model_arch}")
+        logging.debug(f"Rate of using surgery : {Config.sur_rate}")
+        logging.debug(f"Rate of using biopsy : {Config.bio_rate}")
 
         logging.debug(f"surgery : {len(train_df[train_df.surgery == 1])}")
         logging.debug(f"biopsy : {len(train_df[train_df.surgery == 0])}")
@@ -121,7 +121,7 @@ def run_fold(Config, device):
             if epoch == er.val_epoch:
                 torch.save(
                     model.state_dict(),
-                    f"./save/{Config['folder_name']}_{fold + 1}_{epoch}",
+                    f"./save/{Config.folder_name}_{fold + 1}_{epoch}",
                 )
 
         del model, optimizer, train_loader, val_loader, scheduler
@@ -153,7 +153,7 @@ def run_fold(Config, device):
             pretrained=Config.pretrained,
         ).to(device)
         model.load_state_dict(
-            torch.load(f"./save/{Config['folder_name']}_{fold + 1}_{er.val_epoch}")
+            torch.load(f"./save/{Config.folder_name}_{fold + 1}_{er.val_epoch}")
         )
 
         tst_preds = []
@@ -213,9 +213,9 @@ def run_split(Config, device):
         )
         logging.debug("Training Phase")
         logging.debug("practice_type : split")
-        logging.debug(f"model : {Config['model_arch']}")
-        logging.debug(f"Rate of using surgery : {Config['sur_rate']}")
-        logging.debug(f"Rate of using biopsy : {Config['bio_rate']}")
+        logging.debug(f"model : {Config.model_arch}")
+        logging.debug(f"Rate of using surgery : {Config.sur_rate}")
+        logging.debug(f"Rate of using biopsy : {Config.bio_rate}")
 
         logging.debug(f"surgery : {len(train_df[train_df.surgery == 1])}")
         logging.debug(f"biopsy : {len(train_df[train_df.surgery == 0])}")
@@ -281,7 +281,7 @@ def run_split(Config, device):
         if epoch == er.val_epoch:
             torch.save(
                 model.state_dict(),
-                f"./save/{Config['folder_name']}_{epoch}",
+                f"./save/{Config.folder_name}_{epoch}",
             )
 
     del model, optimizer, train_loader, val_loader, scheduler
@@ -310,7 +310,7 @@ def run_split(Config, device):
         model_arch=Config.model_arch,
         pretrained=Config.pretrained,
     ).to(device)
-    model.load_state_dict(torch.load(f"./save/{Config['folder_name']}_{er.val_epoch}"))
+    model.load_state_dict(torch.load(f"./save/{Config.folder_name}_{er.val_epoch}"))
 
     tst_preds = []
     val_preds = []
