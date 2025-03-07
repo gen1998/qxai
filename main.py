@@ -2,6 +2,7 @@ import argparse
 
 import torch
 
+from src.feature import create_features
 from src.train import run_fold, run_split
 from src.utils import seed_everything
 
@@ -11,6 +12,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Process some integers.")
     parser.add_argument("--debug", action="store_true")
     parser.add_argument("--log", action="store_true")
+
+    # action setting
+    parser.add_argument("--create_feature", action="store_true")
     parser.add_argument("--train", action="store_true")
 
     # data setting
@@ -43,6 +47,9 @@ def main():
     print(Config)
     seed_everything(Config.seed)
     device = torch.device("cuda:0")
+
+    if Config.create_feature:
+        create_features(Config=Config)
 
     if Config.train:
         if Config.project_type == "fold":

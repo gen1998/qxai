@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import torch
 
+from . import BASE_PATCH_IMAGE_PATH
+
 
 def data_load(
     ver: str = "split", bio_rate: float = 1.0, sur_rate: float = 1.0
@@ -13,9 +15,9 @@ def data_load(
     df_input = pd.read_csv("./dataset/csv/input.csv")
 
     df_surgery = df_input[df_input.surgery == 1]
-    df_surgery["category"] = "surgery"
+    df_surgery.loc[:, "category"] = "surgery"
     df_biopsy = df_input[df_input.surgery == 0]
-    df_surgery["category"] = "biopsy"
+    df_surgery.loc[:, "category"] = "biopsy"
     num_surgery = int(len(df_surgery) * sur_rate)
     num_biopsy = int(len(df_biopsy) * bio_rate)
     df_surgery = df_surgery.sample(num_surgery).reset_index(drop=True)
@@ -30,7 +32,7 @@ def data_load(
         count = row["count"]
 
         one_label_df["img_path"] = [
-            os.path.join("./dataset/img/", f"{i}_{name}") for i in range(count)
+            os.path.join(BASE_PATCH_IMAGE_PATH, f"{i}_{name}") for i in range(count)
         ]
         one_label_df["img_name_f"] = [f"{i}_{name}" for i in range(count)]
         one_label_df["label"] = row["label"]
@@ -75,3 +77,11 @@ def calc_black_whiteArea(bw_image):
     whiteAreaRatio = whitePixels / image_size
 
     return whiteAreaRatio
+
+
+def column_to_dict(df, key_name, value_name):
+    output = df[[key_name, value_name]]
+    output.index = output[key_name]
+    output = output.drop([key_name], axis=1)
+    output = output.to_dict()[value_name]
+    return output

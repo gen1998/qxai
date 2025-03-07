@@ -4,25 +4,23 @@ import pandas as pd
 import torch
 from tqdm import tqdm
 
-from src.create_dataframe import column_to_dict
 from src.dataset import set_kmeans_dataloader
 from src.model import (
     HepaClassifier,
     hierarchyclustering_train_infer,
     inference_embeddings,
 )
-from src.utils import data_load
+from src.utils import column_to_dict, data_load
 
 
 def kmeans_split(Config, device):
     if Config.log:
         logging.basicConfig(
-            filename=f"./logs/log_{Config.folder_name}.log",
+            filename=f"./logs/log_{Config.project_name}.log",
             level=logging.DEBUG,
             filemode="a",
             format="%(asctime)s - %(levelname)s - %(message)s",
         )
-
         logging.debug("Kmeans Phase of Clustering")
 
     # train用 df の作成
@@ -58,7 +56,7 @@ def kmeans_split(Config, device):
         model_arch=Config.model_arch,
         pretrained=Config.pretrained,
     ).to(device)
-    model.load_state_dict(torch.load(f"save/{Config.folder_name}/split_weight"))
+    model.load_state_dict(torch.load(f"save/{Config.project_name}/split_weight"))
 
     with torch.no_grad():
         tst_embeddings = inference_embeddings(model, tst_loader, device)
@@ -78,6 +76,6 @@ def kmeans_split(Config, device):
     output = pd.concat([test_df, val_df])
     output = output.reset_index(drop=True)
 
-    output.to_csv(f"./result/predicitons/{Config.folder_name}_kmeans.csv", index=False)
+    output.to_csv(f"./result/predicitons/{Config.project_name}_kmeans.csv", index=False)
     if Config.log:
-        logging.debug(f"Kmeans Result filename : {Config.folder_name}_kmeans.csv")
+        logging.debug(f"Kmeans Result filename : {Config.project_name}_kmeans.csv")
