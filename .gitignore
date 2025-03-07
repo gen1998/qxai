@@ -1,0 +1,10 @@
+# file
+.csv
+.python-version
+hello.py
+pyproject.toml
+uv.lock
+
+# uv venv folder
+.venv/
+.vscode/
