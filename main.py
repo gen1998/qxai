@@ -40,7 +40,7 @@ def main():
     # config, global value setting
     Config = parse_arguments()
     print(Config)
-    seed_everything(Config["seed"])
+    seed_everything(Config.seed)
     device = torch.device("cuda:0")
 
     if Config.train:

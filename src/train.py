@@ -22,8 +22,8 @@ def run_fold(Config, device):
     ## data load
     train_df = data_load(
         ver="fold",
-        bio_rate=Config["bio_rate"],
-        sur_rate=Config["sur_rate"],
+        bio_rate=Config.bio_rate,
+        sur_rate=Config.sur_rate,
     )
     print(f"surgery : {len(train_df[train_df.surgery == 1])}")
     print(f"biopsy : {len(train_df[train_df.surgery == 0])}")
@@ -57,16 +57,16 @@ def run_fold(Config, device):
     ]
 
     for fold, (trn_idx, val_idx, tst_idx) in enumerate(folds):
-        if Config["debug"] > 0 and fold > 0:
+        if Config.debug > 0 and fold > 0:
             break
 
         print(f"{fold} fold training start")
 
         train_loader, val_loader = set_train_dataloader(
             df=train_df,
-            input_shape=Config["img_size"],
-            train_bs=Config["bs_size"],
-            valid_bs=Config["bs_size"],
+            input_shape=Config.img_size,
+            train_bs=Config.bs_size,
+            valid_bs=Config.bs_size,
             split=False,
             trn_idx=trn_idx,
             val_idx=val_idx,
@@ -74,25 +74,25 @@ def run_fold(Config, device):
 
         ## train model
         model = HepaClassifier(
-            model_arch=Config["model_arch"],
-            pretrained=Config["pretrained"],
+            model_arch=Config.model_arch,
+            pretrained=Config.pretrained,
         ).to(device)
         optimizer = torch.optim.Adam(
-            model.parameters(), lr=Config["lr"], weight_decay=Config["weight_decay"]
+            model.parameters(), lr=Config.lr, weight_decay=Config.weight_decay
         )
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer,
             T_0=10,
             T_mult=1,
-            eta_min=Config["min_lr"],
+            eta_min=Config.min_lr,
             last_epoch=-1,
         )
-        er = EarlyStopping(Config["er_patience"])
+        er = EarlyStopping(Config.er_patience)
         loss_tr = torch.nn.CrossEntropyLoss().to(device)
         loss_fn = torch.nn.CrossEntropyLoss().to(device)
 
         ## training start
-        for epoch in range(Config["epochs"]):
+        for epoch in range(Config.epochs):
             train_one_epoch(
                 epoch,
                 model,
@@ -116,7 +116,7 @@ def run_fold(Config, device):
                 )
 
             # Early Stopping
-            if er.update(monitor[Config["er_monitor"]], epoch, Config["er_mode"]) < 0:
+            if er.update(monitor[Config.er_monitor], epoch, Config.er_mode) < 0:
                 break
             if epoch == er.val_epoch:
                 torch.save(
@@ -134,14 +134,14 @@ def run_fold(Config, device):
         ## infer dataset
         test_df = data_load(
             ver="fold",
-            bio_rate=Config["bio_rate"],
-            sur_rate=Config["sur_rate"],
+            bio_rate=Config.bio_rate,
+            sur_rate=Config.sur_rate,
         )
 
         tst_loader, tst_df, val_loader, val_df = set_infer_dataloader(
             df=test_df,
-            input_shape=Config["img_size"],
-            valid_bs=Config["bs_size"],
+            input_shape=Config.img_size,
+            valid_bs=Config.bs_size,
             split=False,
             val_idx=val_idx,
             tst_idx=tst_idx,
@@ -149,8 +149,8 @@ def run_fold(Config, device):
 
         ## infer model
         model = HepaClassifier(
-            model_arch=Config["model_arch"],
-            pretrained=Config["pretrained"],
+            model_arch=Config.model_arch,
+            pretrained=Config.pretrained,
         ).to(device)
         model.load_state_dict(
             torch.load(f"./save/{Config['folder_name']}_{fold + 1}_{er.val_epoch}")
@@ -183,7 +183,7 @@ def run_fold(Config, device):
         result = pd.concat([result, val_df])
 
     # 予測結果を保存
-    folder_name = Config["folder_name"]
+    folder_name = Config.folder_name
     folder_path = "./result/predictions/"
 
     result.to_csv(f"{folder_path}/{folder_name}_preds.csv", index=False)
@@ -196,8 +196,8 @@ def run_split(Config, device):
     ## train dataset
     train_df = data_load(
         ver="fold",
-        bio_rate=Config["bio_rate"],
-        sur_rate=Config["sur_rate"],
+        bio_rate=Config.bio_rate,
+        sur_rate=Config.sur_rate,
     )
     print(f"surgery : {len(train_df[train_df.surgery == 1])}")
     print(f"biopsy : {len(train_df[train_df.surgery == 0])}")
@@ -226,33 +226,33 @@ def run_split(Config, device):
 
     train_loader, val_loader = set_train_dataloader(
         df=train_df,
-        input_shape=Config["img_size"],
-        train_bs=Config["bs_size"],
-        valid_bs=Config["bs_size"],
+        input_shape=Config.img_size,
+        train_bs=Config.bs_size,
+        valid_bs=Config.bs_size,
         split=True,
     )
 
     ## train model
     model = HepaClassifier(
-        model_arch=Config["model_arch"],
-        pretrained=Config["pretrained"],
+        model_arch=Config.model_arch,
+        pretrained=Config.pretrained,
     ).to(device)
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=Config["lr"], weight_decay=Config["weight_decay"]
+        model.parameters(), lr=Config.lr, weight_decay=Config.weight_decay
     )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
         optimizer,
         T_0=10,
         T_mult=1,
-        eta_min=Config["min_lr"],
+        eta_min=Config.min_lr,
         last_epoch=-1,
     )
-    er = EarlyStopping(Config["er_patience"])
+    er = EarlyStopping(Config.er_patience)
     loss_tr = torch.nn.CrossEntropyLoss().to(device)
     loss_fn = torch.nn.CrossEntropyLoss().to(device)
 
     ## training start
-    for epoch in range(Config["epochs"]):
+    for epoch in range(Config.epochs):
         train_one_epoch(
             epoch,
             model,
@@ -276,7 +276,7 @@ def run_split(Config, device):
             )
 
         # Early Stopping
-        if er.update(monitor[Config["er_monitor"]], epoch, Config["er_mode"]) < 0:
+        if er.update(monitor[Config.er_monitor], epoch, Config.er_mode) < 0:
             break
         if epoch == er.val_epoch:
             torch.save(
@@ -294,21 +294,21 @@ def run_split(Config, device):
     ## infer dataset
     test_df = data_load(
         ver="split",
-        bio_rate=Config["bio_rate"],
-        sur_rate=Config["sur_rate"],
+        bio_rate=Config.bio_rate,
+        sur_rate=Config.sur_rat,
     )
 
     tst_loader, tst_df, val_loader, val_df = set_infer_dataloader(
         df=test_df,
-        input_shape=Config["img_size"],
-        valid_bs=Config["bs_size"],
+        input_shape=Config.img_size,
+        valid_bs=Config.bs_size,
         split=True,
     )
 
     ## infer model
     model = HepaClassifier(
-        model_arch=Config["model_arch"],
-        pretrained=Config["pretrained"],
+        model_arch=Config.model_arch,
+        pretrained=Config.pretrained,
     ).to(device)
     model.load_state_dict(torch.load(f"./save/{Config['folder_name']}_{er.val_epoch}"))
 
@@ -337,7 +337,7 @@ def run_split(Config, device):
     result.reset_index(drop=True)
 
     # 予測結果を保存
-    folder_name = Config["folder_name"]
+    folder_name = Config.folder_name
     folder_path = "./result/predictions"
 
     result.to_csv(f"{folder_path}/{folder_name}_preds.csv", index=False)
