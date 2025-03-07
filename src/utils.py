@@ -36,6 +36,7 @@ def data_load(
             one_label_df["split"] = row["split"]
         elif ver == "fold":
             one_label_df["fold"] = row["fold"]
+        one_label_df["surgery"] = row["surgery"]
 
         output = pd.concat([output, one_label_df])
 
