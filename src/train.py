@@ -32,7 +32,7 @@ def run_fold(Config, device):
     ## logging
     if Config.log:
         logging.basicConfig(
-            filename=f"./log/{Config.object}.log",
+            filename=f"./log/{Config.project_name}.log",
             level=logging.DEBUG,
             filemode="a",
             format="%(asctime)s - %(levelname)s - %(message)s",
@@ -206,7 +206,7 @@ def run_split(Config, device):
     # logging
     if Config.log:
         logging.basicConfig(
-            filename=f"./log/{Config.object}.log",
+            filename=f"./log/{Config.project_name}.log",
             level=logging.DEBUG,
             filemode="a",
             format="%(asctime)s - %(levelname)s - %(message)s",
