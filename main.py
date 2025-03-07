@@ -2,7 +2,7 @@ import argparse
 
 import torch
 
-from src.train import run_fold
+from src.train import run_fold, run_split
 from src.utils import seed_everything
 
 
@@ -43,8 +43,11 @@ def main():
     seed_everything(Config["seed"])
     device = torch.device("cuda:0")
 
-    if Config.train and Config.project_type == "fold":
-        run_fold(Config=Config, device=device)
+    if Config.train:
+        if Config.project_type == "fold":
+            run_fold(Config=Config, device=device)
+        elif Config.project_type == "split":
+            run_split(Config=Config, device=device)
 
 
 if __name__ == "__main__":
