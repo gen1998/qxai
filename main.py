@@ -18,6 +18,7 @@ def parse_arguments():
     parser.add_argument("--project_type", default="split", type=str)
     parser.add_argument("--bio_rate", default=1.0, type=float)
     parser.add_argument("--sur_rate", default=1.0, type=float)
+    parser.add_argument("--img_size", default=256, type=int)
 
     # training model
     parser.add_argument("--model_arch", default="tf_efficientnet_b3", type=str)

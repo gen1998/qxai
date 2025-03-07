@@ -195,7 +195,7 @@ def run_split(Config, device):
     # train section
     ## train dataset
     train_df = data_load(
-        ver="fold",
+        ver="split",
         bio_rate=Config.bio_rate,
         sur_rate=Config.sur_rate,
     )

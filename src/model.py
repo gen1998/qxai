@@ -32,13 +32,13 @@ class HepaClassifier(nn.Module):
         super().__init__()
         self.model = timm.create_model(model_arch, pretrained=pretrained)
 
-        if hasattr(self.backbone, "classifier"):
+        if hasattr(self.model, "classifier"):
             n_features = self.model.classifier.in_features
             self.model.classifier = nn.Linear(n_features, n_class)
-        elif hasattr(self.backbone, "head"):
+        elif hasattr(self.model, "head"):
             n_features = self.model.head.in_features
             self.model.head = nn.Linear(n_features, n_class)
-        elif hasattr(self.backbone, "fc"):
+        elif hasattr(self.model, "fc"):
             n_features = self.model.fc.in_features
             self.model.fc = nn.Linear(n_features, n_class)
 
