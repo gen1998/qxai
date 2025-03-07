@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("pytorch-image-models/")
+
 import lightgbm as lgb
 import numpy as np
 import pandas as pd
